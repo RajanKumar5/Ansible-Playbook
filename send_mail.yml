@@ -1,0 +1,23 @@
+---
+  - name: send mail from postfix
+    hosts: servers
+    vars:
+      pkg: 
+        - httpd
+        - vsftpd
+        - meradb
+    tasks:
+      - block:
+        - name: install {{ pkg }}
+          yum:
+            name: "{{ pkg }}"
+            state: present
+        rescue:
+          - name: rescue block
+            mail:
+              host: localhost
+              port: 25
+              to: RECEIVER NAME <xyz@gmail.com>
+              subject: mail subject
+              body: mail body
+...
