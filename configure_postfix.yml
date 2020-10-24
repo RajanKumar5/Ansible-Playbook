@@ -1,0 +1,42 @@
+---
+  - name: configure postfix to send main through gmail.
+    hosts: servers
+    vars:
+      pkg:
+        - postfix
+        - mailx
+        - cyrus-sasl-plain
+      srv: postfix
+    tasks:
+      - name: installing {{ pkg }}
+        yum:
+          name: "{{ pkg }}"
+          state: present
+      - name: enable {{ srv }}
+        service: 
+           name: "{{ srv }}"
+           state: started
+           enabled: true
+      - name: copy mail.cf
+        template:
+          src: main.j2
+          dest: /etc/postfix/main.cf
+      - name: copy sasl_passwd
+        copy:
+          src: /etc/postfix/sasl_passwd
+          dest: /etc/postfix/sasl_passwd
+          owner: root
+          group: postfix
+          mode: 0640
+      - name: run postmap command
+        command: postmap /etc/postfix/sasl_passwd
+      - name: reload postfix
+        service:
+          name: postfix
+          state: started
+          enabled: true
+...
+          
+          
+          
+
