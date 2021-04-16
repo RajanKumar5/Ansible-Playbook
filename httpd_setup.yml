@@ -1,0 +1,34 @@
+---
+  - name: setup httpd server
+    hosts: webservers
+    tasks:
+      - name: installing httpd package
+        yum:
+          name: httpd
+          state: latest
+      
+      - name: start and enable httpd services
+        service: 
+          name: httpd
+          state: started
+          enabled: true
+
+      - name: create index.html file
+        copy: 
+          content: Hello from {{ ansible_nodename }}
+          dest: /var/www/html/index.html
+        notify: restart httpd server
+
+      - name: managing firewall services
+        firewalld:
+          service: http
+          state: enabled
+          permanent: true
+          immediate: true
+
+    handlers:
+      - name: restart httpd server
+        service:
+          name: httpd
+          state: restarted
+...
